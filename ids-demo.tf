@@ -83,8 +83,10 @@ resource "google_service_networking_connection" "private_vpc_connection" {
 resource "null_resource" "ids_endpoint" {
   triggers = {
     network = google_compute_network.cloud_ids_network.id
-   # zone    = data.google_compute_zones.main.names[0]
-  #  name    = "${local.prefix}-ids-endpoint"
+  local_vpc_network_name = var.vpc_network_name 
+  local_ids_network_zone = var.ids_network_zone
+  project = "${data.local_file.proj_id.content}"
+  
   }
 
 
@@ -94,11 +96,11 @@ resource "null_resource" "ids_endpoint" {
 
   }
 
- # provisioner "local-exec" {
- #   when        = destroy
- #   command     = "gcloud ids endpoints delete cloud-ids-${var.vpc_network_name} --zone ${var.ids_network_zone}"
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "gcloud ids endpoints delete cloud-ids-${self.triggers.local_vpc_network_name} --zone ${self.triggers.local_ids_network_zone} --project=${self.triggers.project}"
   
- # }
+  }
 
    depends_on = [
     time_sleep.wait_60_seconds_enable_service_api,
@@ -114,6 +116,23 @@ resource "null_resource" "ids_endpoint" {
   depends_on = [null_resource.ids_endpoint]
   create_duration = "17m"
  }
+
+ resource "null_resource" "proj_id" {
+  triggers = {
+    network = google_compute_network.cloud_ids_network.id
+ 
+ }
+  provisioner "local-exec" {
+    command     =  <<EOT
+   echo "${var.demo_project_id}${random_string.id.result}" >> ${path.module}/proj_id.txt
+    EOT
+   working_dir = path.module
+
+
+}
+depends_on = [time_sleep.wait_60_seconds_enable_service_api]
+   
+}
 
  resource "null_resource" "forward_rule" {
   triggers = {
@@ -137,24 +156,33 @@ data "local_file" "forward_rule" {
   depends_on = [null_resource.forward_rule]
 }
 
+data "local_file" "proj_id" {
+    filename = "${path.module}/proj_id.txt"
+  depends_on = [null_resource.proj_id]
+}
+
 
 resource "null_resource" "packet_mirrors" {
  triggers = {
     network = google_compute_network.cloud_ids_network.id
-   
+    local_region = var.ids_network_region
+   project = "${data.local_file.proj_id.content}"
+
  }
 
   provisioner "local-exec" {
     command     =  <<EOT
     gcloud compute packet-mirrorings create cloud-ids-packet-mirroring --region=${var.ids_network_region} --network=${var.vpc_network_name} --mirrored-subnets=cloud-ids-${var.ids_network_region} --project=${var.demo_project_id}${random_string.id.result} --collector-ilb=${data.local_file.forward_rule.content}
+   # export project = google_project.demo_project.project_id.value
     EOT
     working_dir = path.module
   }
   
-  # provisioner "local-exec" {
-   #  when        = destroy
-   #command     = "gcloud compute packet-mirrorings delete cloud-ids-packet-mirroring --region=${var.ids_network_region}"
- #}
+   provisioner "local-exec" {
+    when        = destroy
+  command     = "gcloud compute packet-mirrorings delete cloud-ids-packet-mirroring --region=${self.triggers.local_region} --project=${self.triggers.project}"
+ working_dir = path.module
+ }
 
  depends_on = [data.local_file.forward_rule]
    
