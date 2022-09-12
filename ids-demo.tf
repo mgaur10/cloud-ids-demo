@@ -299,7 +299,6 @@ resource "google_compute_instance" "attacker_server" {
       enable_secure_boot = true
   }
   depends_on = [
-    time_sleep.wait_60_seconds_enable_service_api,
     google_compute_router_nat.nats,
     time_sleep.wait_30_seconds_victim_server,
     null_resource.packet_mirrors,
