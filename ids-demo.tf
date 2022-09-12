@@ -300,7 +300,9 @@ resource "google_compute_instance" "attacker_server" {
   }
   depends_on = [
     time_sleep.wait_60_seconds_enable_service_api,
-    google_compute_router_nat.nats,
+    google_compute_router_nat.ids_nats,
+    time_sleep.wait_30_seconds_victim_server,
+    null_resource.packet_mirrors,
     ]
 
   boot_disk {
@@ -320,14 +322,9 @@ resource "google_compute_instance" "attacker_server" {
     email  = google_service_account.compute_service_account.email
     scopes = ["cloud-platform"]
   }
-  depends_on = [
-    time_sleep.wait_60_seconds_enable_service_api,
-    google_compute_router_nat.ids_nats,
-    time_sleep.wait_30_seconds_victim_server,
-    null_resource.packet_mirrors,
-    ]
-metadata_startup_script = "curl http://192.168.10.20/?item=../../../../WINNT/win.ini;curl http://192.168.10.20/eicar.file;curl http://192.168.10.20/cgi-bin/../../../..//bin/cat%20/etc/passwd;curl -H 'User-Agent: () { :; }; 123.123.123.123:9999' http://172.16.10.20/cgi-bin/test-critical"
+ metadata_startup_script = "curl http://192.168.10.20/?item=../../../../WINNT/win.ini;curl http://192.168.10.20/eicar.file;curl http://192.168.10.20/cgi-bin/../../../..//bin/cat%20/etc/passwd;curl -H 'User-Agent: () { :; }; 123.123.123.123:9999' http://172.16.10.20/cgi-bin/test-critical"
 }
+
 
 # Create a CloudRouter
 resource "google_compute_router" "router" {
