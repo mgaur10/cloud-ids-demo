@@ -249,9 +249,9 @@ resource "google_service_account" "compute_service_account" {
 }
 
 # Create Server Instance
-resource "google_compute_instance" "server_engine" {
+resource "google_compute_instance" "victim_server" {
   project = google_project.demo_project.project_id
-  name         = "server"
+  name         = "victim-server"
   machine_type = "n2-standard-4"
   zone         = var.ids_network_zone
   shielded_instance_config {
@@ -282,10 +282,16 @@ resource "google_compute_instance" "server_engine" {
   metadata_startup_script = "apt-get update -y;apt-get install -y nginx;cd /var/www/html/;sudo touch eicar.file"
 }
 
-# Create Attacker Instance
-resource "google_compute_instance" "attacker_engine" {
+resource "time_sleep" "wait_30_seconds_victim_server" {
+  depends_on = [google_compute_instance.victim_server]
+  create_duration = "30s"
+}
+
+
+# Create Instance
+resource "google_compute_instance" "attacker_server" {
   project = google_project.demo_project.project_id
-  name         = "attacker"
+  name         = "attacker-server"
   machine_type = "n2-standard-4"
   zone         =  var.ids_network_zone
  # network_ip= "192.168.10.10"
@@ -314,6 +320,13 @@ resource "google_compute_instance" "attacker_engine" {
     email  = google_service_account.compute_service_account.email
     scopes = ["cloud-platform"]
   }
+  depends_on = [
+    time_sleep.wait_60_seconds_enable_service_api,
+    google_compute_router_nat.ids_nats,
+    time_sleep.wait_30_seconds_victim_server,
+    null_resource.packet_mirrors,
+    ]
+metadata_startup_script = "curl http://192.168.10.20/?item=../../../../WINNT/win.ini;curl http://192.168.10.20/eicar.file;curl http://192.168.10.20/cgi-bin/../../../..//bin/cat%20/etc/passwd;curl -H 'User-Agent: () { :; }; 123.123.123.123:9999' http://172.16.10.20/cgi-bin/test-critical"
 }
 
 # Create a CloudRouter
