@@ -300,7 +300,7 @@ resource "google_compute_instance" "attacker_server" {
   }
   depends_on = [
     time_sleep.wait_60_seconds_enable_service_api,
-    google_compute_router_nat.ids_nats,
+    google_compute_router_nat.nats,
     time_sleep.wait_30_seconds_victim_server,
     null_resource.packet_mirrors,
     ]
