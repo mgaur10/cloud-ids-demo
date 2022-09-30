@@ -15,7 +15,7 @@
     */
 
 
-    ## This provides PoC demo environment for various use cases
+    ## This provides PoC demo environment for Cloud IDS
     ## NOTE this is not built for production workload ##
 
     # Random id for naming
