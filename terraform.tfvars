@@ -13,13 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-     
-   
-organization_id = "xxxxxxxxxx"
-billing_account = "xxxx-xxxxx-xxxxxx"
+
+
+## This provides PoC demo environment for various use cases
+## NOTE this is not built for production workload ##
+
+
+organization_id = "XXXXXXX"
+billing_account = "XXXX-XXXX-XXXXX"
+proxy_access_identities = "user:abc@xyz.com"
+
+
 folder_name = "Cloud IDS Demo "
 demo_project_id = "ids-demo-" 
 vpc_network_name = "cloud-ids-vpc"
-ids_network_region = "us-east1"
-ids_network_zone = "us-east1-b"
-
+network_region = "us-east1"
+network_zone = "us-east1-b"
