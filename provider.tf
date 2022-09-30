@@ -13,14 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-         
-     
- provider "google" {
-}
 
-provider "google" {
-    alias = "service"
-    impersonate_service_account = google_service_account.def_ser_acc.email
-      region  = "us-central1"
-  zone    = "us-central1-c"
+
+## This provides PoC demo environment for various use cases
+## NOTE this is not built for production workload ##
+
+
+
+terraform {
+  required_version = ">= 0.13"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 3.53, < 5.0"
+    }
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = ">= 3.53, < 5.0"
+    }
+  }
+  
 }
