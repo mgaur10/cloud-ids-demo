@@ -4,11 +4,11 @@ The Terraform Script will create a folder with a project in it. Follow the instr
 
 
 Assign yourself the following roles if you do not already have them:
-  Billing Account User
-  Folder Creator
-  Organization Role Viewer
-  Organization Viewer
-  Project Creator
+  Billing Account User,
+  Folder Creator,
+  Organization Role Viewer,
+  Organization Viewer,
+  Project Creator,
   Billing role - roles/billing.user
 
 >> Open up Cloud shell and clone the following git repository using the command below
