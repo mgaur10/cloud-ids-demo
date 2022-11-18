@@ -3,7 +3,7 @@
 The Terraform Script will create a folder with a project in it. Follow the instructions to implement and deploy Cloud IDS (Intrusion Detection System), a next-generation advanced intrusion detection service that provides threat detection for intrusions, malware, spyware and command-and-control attacks. You will simulate multiple attacks and view the threat details in the Cloud Console. This demo uses Cloud IDS, Compute, Service Networking, and Cloud Logging.
 
 
->> Assign yourself the following roles if you do not already have them:
+Assign yourself the following roles if you do not already have them:
   Billing Account User
   Folder Creator
   Organization Role Viewer
